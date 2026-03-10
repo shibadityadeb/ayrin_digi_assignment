@@ -62,6 +62,36 @@ cd backend && npm install
 cd ../frontend && npm install
 ```
 
+### Configure environment variables
+
+Copy the example files and edit values as needed:
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+**`backend/.env`**
+```env
+PORT=5001
+CLIENT_URL=http://localhost:3000
+```
+
+**`frontend/.env`**
+```env
+VITE_API_URL=http://localhost:5001/api
+VITE_SOCKET_URL=http://localhost:5001
+VITE_APP_URL=http://localhost:3000
+```
+
+For production, set these to your deployed URLs, e.g.:
+```env
+# frontend/.env
+VITE_API_URL=https://api.yourdomain.com/api
+VITE_SOCKET_URL=https://api.yourdomain.com
+VITE_APP_URL=https://yourdomain.com
+```
+
 ### Run
 
 Open two terminals:

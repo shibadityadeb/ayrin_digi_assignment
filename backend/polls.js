@@ -108,6 +108,7 @@ function closePoll(id) {
 }
 
 function createPollRouter(io) {
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
   const router = Router();
 
   router.post('/', (req, res) => {
@@ -121,7 +122,7 @@ function createPollRouter(io) {
         totalVotes: poll.totalVotes,
         createdAt: poll.createdAt,
         expiresAt: poll.expiresAt,
-        shareUrl: `http://localhost:3000/poll/${poll.id}`,
+        shareUrl: `${clientUrl}/poll/${poll.id}`,
       });
     } catch (err) {
       res.status(err.status || 500).json({ error: err.message });
