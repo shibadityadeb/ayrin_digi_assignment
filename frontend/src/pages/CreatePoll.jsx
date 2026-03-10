@@ -34,7 +34,7 @@ export default function CreatePoll() {
     try {
       setLoading(true);
       const { data } = await createPoll({ question, options: filledOptions });
-      navigate(`/polls/${data.id}`);
+      navigate(`/poll/${data.id}`);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create poll.');
     } finally {

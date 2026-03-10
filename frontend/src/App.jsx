@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import PollList from './pages/PollList';
 import CreatePoll from './pages/CreatePoll';
-import PollDetail from './pages/PollDetail';
+import PollVote from './pages/PollVote';
 
 export default function App() {
   return (
@@ -16,9 +15,8 @@ export default function App() {
         </header>
         <main className="px-4 pb-12">
           <Routes>
-            <Route path="/" element={<PollList />} />
-            <Route path="/create" element={<CreatePoll />} />
-            <Route path="/polls/:id" element={<PollDetail />} />
+            <Route path="/" element={<CreatePoll />} />
+            <Route path="/poll/:id" element={<PollVote />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

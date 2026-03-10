@@ -142,8 +142,8 @@ function createPollRouter(io) {
       const ip = req.ip || req.socket.remoteAddress;
       const { optionId } = req.body;
       const poll = votePoll(req.params.id, optionId, ip);
-      io.emit('poll:updated', poll);
-      res.json(poll);
+      io.emit('voteUpdate', poll);
+      res.json({ success: true, poll });
     } catch (err) {
       res.status(err.status || 500).json({ error: err.message });
     }
