@@ -12,11 +12,16 @@ const allowedOrigins = process.env.CLIENT_URL
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: origin ${origin} not allowed`));
-    }
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.some((allowed) => {
+      if (allowed.includes('.vercel.app')) {
+        const base = allowed.replace('https://', '').replace('.vercel.app', '');
+        const re = new RegExp(`^https://${base}(-[a-z0-9]+)?\\.vercel\\.app$`);
+        return re.test(origin);
+      }
+      return allowed === origin;
+    });
+    isAllowed ? callback(null, true) : callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   methods: ['GET', 'POST'],
 };
