@@ -29,6 +29,16 @@ export default function PollVote() {
   const [error, setError] = useState('');
   const [hasVoted, setHasVoted] = useState(false);
   const [selected, setSelected] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = `${window.location.origin}/poll/${id}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const fetchPoll = useCallback(async () => {
     try {
@@ -47,18 +57,39 @@ export default function PollVote() {
   useEffect(() => {
     fetchPoll();
 
-    socket.on('voteUpdate', (updated) => {
+    function onVoteUpdate(updated) {
       if (updated.id === id) setPoll(updated);
-    });
-    socket.on('poll:closed', (updated) => {
-      if (updated.id === id) setPoll(updated);
-    });
+    }
+    function onPollClosed(updated) {
+      if (updated.id === id) {
+        setPoll(updated);
+        setHasVoted(true);
+      }
+    }
+
+    socket.on('voteUpdate', onVoteUpdate);
+    socket.on('poll:closed', onPollClosed);
 
     return () => {
-      socket.off('voteUpdate');
-      socket.off('poll:closed');
+      socket.off('voteUpdate', onVoteUpdate);
+      socket.off('poll:closed', onPollClosed);
     };
   }, [id, fetchPoll]);
+
+  useEffect(() => {
+    if (!poll?.expiresAt || poll.status === 'closed') return;
+    const ms = new Date(poll.expiresAt) - Date.now();
+    if (ms <= 0) {
+      setPoll((p) => (p ? { ...p, status: 'closed' } : p));
+      setHasVoted(true);
+      return;
+    }
+    const t = setTimeout(() => {
+      setPoll((p) => (p ? { ...p, status: 'closed' } : p));
+      setHasVoted(true);
+    }, ms);
+    return () => clearTimeout(t);
+  }, [poll?.expiresAt, poll?.status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,6 +134,19 @@ export default function PollVote() {
 
       <h1 className="text-2xl font-bold text-gray-800 mb-2">{poll.question}</h1>
 
+      <div className="mt-4 mb-6 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Share</p>
+        <div className="flex items-center gap-2">
+          <span className="flex-1 text-sm text-gray-600 truncate">{shareUrl}</span>
+          <button
+            onClick={handleCopy}
+            className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-300 text-indigo-600 hover:bg-indigo-50 transition-colors"
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      </div>
+
       {poll.expiresAt && (
         <p className="text-xs text-gray-400 mb-6">
           Expires {new Date(poll.expiresAt).toLocaleString()}
@@ -144,7 +188,9 @@ export default function PollVote() {
         </form>
       ) : (
         <div className="mt-4">
-          {poll.status === 'active' && (
+          {poll.status === 'closed' ? (
+            <p className="text-red-500 text-sm font-medium mb-4">This poll is closed.</p>
+          ) : (
             <p className="text-green-600 text-sm font-medium mb-4">✓ Your vote was recorded</p>
           )}
           <PollResults poll={poll} />

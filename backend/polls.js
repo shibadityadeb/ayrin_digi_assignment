@@ -42,7 +42,6 @@ function createPoll(data) {
     question: question.trim(),
     allowMultiple,
     status: 'active',
-    totalVotes: 0,
     voters: new Set(),
     createdAt: new Date(),
     expiresAt: expiresAt ? new Date(expiresAt) : null,

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import CreatePoll from './pages/CreatePoll';
 import PollVote from './pages/PollVote';
 
@@ -8,9 +8,9 @@ export default function App() {
       <div className="min-h-screen bg-gray-100">
         <header className="bg-indigo-700 shadow">
           <div className="max-w-2xl mx-auto px-4 py-4">
-            <a href="/" className="text-white text-xl font-bold tracking-tight">
+            <Link to="/" className="text-white text-xl font-bold tracking-tight">
               Poll Creator
-            </a>
+            </Link>
           </div>
         </header>
         <main className="px-4 pb-12">
