@@ -6,15 +6,16 @@ const { Server } = require('socket.io');
 const { createPollRouter } = require('./polls');
 
 const PORT = process.env.PORT || 5001;
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((u) => u.trim())
-  : ['http://localhost:3000'];
 
 const corsOptions = {
   origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    if (origin.endsWith('.vercel.app') && allowedOrigins.some((a) => a.endsWith('.vercel.app') && origin.startsWith(a.replace('.vercel.app', '')))) {
+    // Allow any Vercel deployment and localhost dev
+    if (
+      origin === 'http://localhost:3000' ||
+      /^https:\/\/[\w-]+\.vercel\.app$/.test(origin)
+    ) {
       return callback(null, true);
     }
     callback(null, false);
