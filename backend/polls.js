@@ -108,7 +108,7 @@ function closePoll(id) {
 }
 
 function createPollRouter(io) {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  const clientUrl = (process.env.CLIENT_URL || 'http://localhost:3000').split(',')[0].trim();
   const router = Router();
 
   router.post('/', (req, res) => {
